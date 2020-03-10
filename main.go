@@ -6,26 +6,21 @@ import (
 	"Allfather/site/home/ymir/api/v1"
 	"Allfather/site/home/ymir/veorfolnir"
 	"fmt"
+	"time"
 )
 
 const port = "8080"
-const stockApi = "https://financialmodelingprep.com/api/v3/stock/real-time-price"
+
+var timer *time.Timer
 
 func main() {
-	stocky := veorfolnir.StockQueryImpl{
-		Api: stockApi,
-	}
-
-	stocks := stocky.GetLatest()
-	for _, stock := range stocks {
-		fmt.Printf(
-			"Name: %s ", stock.Symbol)
-		fmt.Printf(
-			"Cost: %d ", stock.Price)
-		fmt.Printf(
-			"Exponant: %d ", stock.Exponent)
-		fmt.Println("----------------------------")
-	}
+	veorfolnir.FetchStocks()
+	timer = time.AfterFunc(time.Minute, func() {
+		fmt.Println("Timer has expired, fetching stocks")
+		veorfolnir.FetchStocks()
+		timer.Reset(time.Minute)
+	})
+	defer timer.Stop()
 
 	serverInstance := server.New()
 
@@ -40,3 +35,4 @@ func main() {
 
 	server.Serve(serverInstance, port)
 }
+
