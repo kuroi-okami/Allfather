@@ -1,6 +1,7 @@
 package veorfolnir
 
 import (
+	"Allfather/utility/db/aurora"
 	"database/sql"
 	"fmt"
 	"time"
@@ -35,7 +36,7 @@ type veorfolnirImpl struct {
 }
 
 func (f veorfolnirImpl) initDb() {
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := sql.Open("postgres", aurora.MakeAuroraConnection(aurora.Endpoint, aurora.DbName))
 	if err != nil {
 		panic(err)
 	}
